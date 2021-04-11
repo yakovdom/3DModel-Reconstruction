@@ -1,0 +1,5 @@
+tornado==6.0.3
+requests==2.23.0
+Werkzeug>=1.0.1
+Psycopg2-binary>=2.8.6
+boto3>=1.17.17
