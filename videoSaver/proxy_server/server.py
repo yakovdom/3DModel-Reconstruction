@@ -7,6 +7,8 @@ import uuid
 
 from sys import stdout as st
 
+from object_storage import storage
+
 def report(msg):
     st.write('\n\nREPORT: {}\n\n'.format(msg))
     st.flush()
@@ -17,13 +19,13 @@ SERVICE_PORT = 1234
 class Handler(tornado.web.RequestHandler):
     def post(self):
         report(self.request.body)
-        filename = uuid.uuid4()
+        filename = str(uuid.uuid4())
         uploaded_file = self.request.body
         try:
-            object_storage.object_storage().save(filename, uploaded_file)
-        except:
+            storage().save(filename, uploaded_file)
+        except Exception as e:
             self.set_status(500, 'Server error')
-            self.write({'error': 'Object storage unavailable'})
+            self.write({'error': 'Object storage unavailable: {}'.format(e)})
             return
 
         self.set_status(200, 'OK')
@@ -38,7 +40,7 @@ class Handler(tornado.web.RequestHandler):
             return
 
         try:
-            file_content = object_storage().load(filename)
+            file_content = storage().load(filename)
         except:
             self.set_status(500, 'Server error')
             self.write({'error': 'object storage unavalibale'})

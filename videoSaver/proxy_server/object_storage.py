@@ -52,7 +52,7 @@ class ObjectStorage:
 
 global_object_storage = None
 
-def object_storage():
+def storage():
     global global_object_storage
     if global_object_storage is None:
         global_object_storage = ObjectStorage()
