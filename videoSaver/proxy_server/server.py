@@ -19,64 +19,33 @@ class Handler(tornado.web.RequestHandler):
         report(self.request.body)
         filename = uuid.uuid4()
         uploaded_file = self.request.body
-        object_storage.object_storage().save(filename, uploaded_file)
-        '''
-        body = json.loads(self.request.body)
-        name = body['name']
-        id = body['id']
-        category = body['category']
-        process_db_answer(self, *items.add(id, name, category))
-        '''
+        try:
+            object_storage.object_storage().save(filename, uploaded_file)
+        except:
+            self.set_status(500, 'Server error')
+            self.write({'error': 'Object storage unavailable'})
+            return
+
+        self.set_status(200, 'OK')
+        self.write({'filename': filename})
 
     def get(self):
-        '''
-        global items, authorizer
-        if not check_authorization_and_fields(self, 'get_item', ['id']):
-            return
-
-        body = json.loads(self.request.body)
-        id = body.pop('id')
-        process_db_answer(self, *items.get_by_id(id))
-        '''
-
-    '''
-    def put(self):
-        global items
-        if not check_authorization_and_fields(self, 'change_item', ['id']):
-            return
-
-        body = json.loads(self.request.body)
-        id = body.pop('id')
-
-        process_db_answer(self, *items.update(id, body['name'], body['category']))
-
-    def delete(self):
-        global items
-        if not check_authorization_and_fields(self, 'delete_item', ['id']):
-            return
-
-        body = json.loads(self.request.body)
-        id = body.pop('id')
-
-        process_db_answer(self, *items.delete(id))
-    '''
-
-'''
-class ItemsHandler(tornado.web.RequestHandler):
-    def get(self):
         try:
-            offset = int(self.get_query_argument('offset'))
+            filename = self.get_query_argument('filename')
         except:
-            offset = 0
+            self.set_status(400, 'Bad request')
+            self.write({'error': 'need filename'})
+            return
 
         try:
-            limit = int(self.get_query_argument('limit'))
+            file_content = object_storage().load(filename)
         except:
-            limit = 10000
-        st.write('\n\n{} {} \n\n'.format(limit, offset))
-        st.flush()
-        process_db_answer(self, *items.get_all(offset, limit))
-'''
+            self.set_status(500, 'Server error')
+            self.write({'error': 'object storage unavalibale'})
+            return
+
+        self.set_status(200, 'OK')
+        self.write(file_content)
 
 
 class Application(tornado.web.Application):
