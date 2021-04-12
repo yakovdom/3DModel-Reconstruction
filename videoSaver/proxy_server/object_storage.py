@@ -47,7 +47,7 @@ class ObjectStorage:
     def load(self, key):
         # Получить объект
         get_object_response = self.s3.get_object(Bucket=self.bucket_name, Key=key)
-        print(get_object_response['Body'].read())
+        #print(get_object_response['Body'].read())
         return get_object_response['Body'].read()
 
 global_object_storage = None
