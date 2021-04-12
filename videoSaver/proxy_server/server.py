@@ -18,10 +18,29 @@ SERVICE_PORT = 1234
 
 class Handler(tornado.web.RequestHandler):
     def post(self):
-        report(self.request.body)
-        filename = str(uuid.uuid4())
+        # report(self.request.body)
         uploaded_file = self.request.body
+
+        report(self.request.headers)
+
         try:
+            filename = self.get_query_argument('filename')
+        except:
+            self.set_status(400, 'Bad request')
+            self.write({'error': 'need filename'})
+            report('missing filename')
+            return
+
+        try:
+            type_ = self.get_query_argument('type')
+        except:
+            self.set_status(400, 'Bad request')
+            self.write({'error': 'need type'})
+            report('missing type')
+            return
+
+        try:
+            # Content-Disposition: form-data\r\n\r\n
             storage().save(filename, uploaded_file)
         except Exception as e:
             self.set_status(500, 'Server error')
@@ -30,8 +49,10 @@ class Handler(tornado.web.RequestHandler):
 
         self.set_status(200, 'OK')
         self.write({'filename': filename})
+        report(filename)
 
     def get(self):
+        report('GET')
         try:
             filename = self.get_query_argument('filename')
         except:
