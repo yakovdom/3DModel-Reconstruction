@@ -41,6 +41,11 @@ def main():
 
     meta = json.loads(response.content)
 
+    meta['scene'] = args.name
+    meta['dataset'] = 'sample'
+    meta['path'] = '.'
+
+
     frames = []
     for frame in meta['frames']:
         response = requests.get(URL + '?filename=' + frame['file_name_image'])
