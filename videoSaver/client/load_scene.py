@@ -3,11 +3,11 @@ import json
 import requests
 
 
-URL = ':1234/'
+URL = 'http://130.193.38.176:1234/'
 
 def main():
     parser = argparse.ArgumentParser(description='Load Scene from object storage')
-    parser.add_argument('name', type=string, help='scene name')
+    parser.add_argument('name', help='scene name')
 
     args = parser.parse_args()
 
@@ -20,10 +20,10 @@ def main():
 
     frames = []
     for frame in meta['frames']:
-        response = requests.get(URL + '?filename=' + frame['path'])
-        data = requests.get(URL + '?filename=' + args.name)
-        filename = ''
-        with open(filename, 'w') as f:
+        response = requests.get(URL + '?filename=' + frame['file_name_image'])
+        data = response.content
+        filename = frame['file_name_image']
+        with open(filename, 'wb') as f:
             f.write(data)
         frame['path'] = filename
 
